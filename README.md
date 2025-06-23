@@ -97,6 +97,8 @@ Create a `.env` file in the `configs/` folder and add your Gemini API key:
 ```env
 GEMINI_API_KEY=your-google-api-key
 GEMINI_MODEL=gemini-2.0-flash
+DOCUMENT_PATH="./data"
+EMBEDDING_MODEL=google-generativeai
 ```
 
 ---
