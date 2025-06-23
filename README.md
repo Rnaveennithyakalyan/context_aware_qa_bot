@@ -1,18 +1,18 @@
 #  Context-Aware QA Bot (Powered by Gemini & FAISS)
 
-A powerful, modular command-line assistant that lets you ask questions grounded in documents—leveraging Google's Gemini API and FAISS-based semantic search for precise, contextually accurate responses.
+A powerful, modular command-line assistant that uses Retrieval-Augmented Generation (RAG) to answer questions based on your documents—leveraging Google's Gemini API and FAISS-based semantic search for fast, relevant, and contextually accurate responses.
 
 ---
 
 ##  Features
 
--  Context-aware question answering using your own document content  
--  Natural language responses powered by Gemini (`gemini-2.0-flash` by default)  
--  Fully integrated ingestion, indexing, and retrieval in a single command  
--  PDF-based knowledge embedding using Sentence Transformers + FAISS  
--  Multi-turn interactive CLI conversations with real-time Q&A  
--  Secure environment variable handling via `.env`  
--  Modular design for easy extension into web apps or APIs
+-  Retrieval-Augmented Generation (RAG) using custom PDFs
+-  Gemini-powered natural language responses (`gemini-2.0-flash` by default)
+-  PDF ingestion and semantic vector indexing in one command
+-  High-speed document similarity search with FAISS
+-  Multi-turn terminal chat with real-time AI responses
+   API key and model configuration via secure `.env`
+-  Modular components for CLI, web app, or API integration
 
 ---
 
@@ -21,22 +21,34 @@ A powerful, modular command-line assistant that lets you ask questions grounded 
 ```
 context_aware_qa_bot/
 ├── configs/
-│   ├── .env                # Stores Gemini API key & model name (excluded from repo)
-│   └── config.yaml         # Optional configuration (e.g. paths, settings)
+│   ├── .env                # Stores Gemini API key (not committed)
+│   └── config.yaml         # Optional configuration (paths, defaults)
 ├── data/
-│   └── extracted_text.txt  # Auto-generated from PDFs
-├── faiss_index/            # FAISS embedding index (auto-generated)
-├── models/                 # Model cache or exported models (auto-populated)
+│   └── attention.pdf       # Upload your PDF(s) here
+│   └── extracted_text.txt  # Auto-generated during ingestion
+├── faiss_index/            # FAISS vector index (auto-generated)
+├── models/                 # Model cache / temp storage (auto-populated)
 ├── src/
-│   ├── ingest.py           # Extracts text from input PDFs
-│   ├── indexing.py         # Converts text into vector embeddings
-│   ├── qa_bot.py           # Gemini response module with retrieval
-│   ├── retrieval.py        # Reusable FAISS retrieval logic
-│   └── run_bot.py          # Unified launcher for ingestion + indexing + Q&A loop
+│   ├── ingest.py           # Extracts text from your uploaded PDF
+│   ├── indexing.py         # Embeds and indexes text using FAISS
+│   ├── qa_bot.py           # Gemini response logic
+│   ├── retrieval.py        # FAISS-based context retriever
+│   └── run_bot.py          # All-in-one launcher script
 ├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
+
+---
+
+##  What is RAG (Retrieval-Augmented Generation)?
+
+**Retrieval-Augmented Generation** is a hybrid AI architecture that combines two components:
+
+1. **Retriever** — Finds the most relevant information from a local knowledge base using vector similarity (powered by FAISS in this project).
+2. **Generator** — A language model (Gemini) that uses this retrieved content to generate grounded, coherent answers.
+
+This prevents hallucinations, increases traceability, and makes the model act more like a smart assistant tied directly to your documents.
 
 ---
 
@@ -64,7 +76,7 @@ source venv/bin/activate         # macOS/Linux
 pip install -r requirements.txt
 ```
 
-Required packages include:
+Dependencies include:
 ```
 google-generativeai
 python-dotenv
@@ -78,35 +90,42 @@ tqdm
 
 ---
 
-##  API Key Configuration
+##  API Key Setup
 
-Create a `.env` file inside the `configs/` folder:
+Create a `.env` file in the `configs/` folder and add your Gemini API key:
 
 ```env
 GEMINI_API_KEY=your-google-api-key
 GEMINI_MODEL=gemini-2.0-flash
 ```
 
-*Do NOT upload this `.env` file to GitHub.*
+> Never commit your `.env` file to version control
 
-Optionally, you may define other paths or settings in `configs/config.yaml`.
+---
+
+##  Upload Your PDF (Before Running)
+
+To use this bot, you must upload at least one PDF document:
+
+- Place your file (e.g., `attention.pdf`) inside the `data/` folder
+- You can rename your file or change the file path in `src/ingest.py` as needed
 
 ---
 
 ##  Running the Assistant
 
-Once your document is placed in the `data/` folder (e.g. `attention.pdf`), launch the bot with:
+Start the full pipeline with:
 
 ```bash
 python src/run_bot.py
 ```
 
 This will:
-1.  Extract text from the PDF using `ingest.py`  
-2.  Generate semantic embeddings and build the FAISS index via `indexing.py`  
-3.  Start a chat loop where you can query the content using Gemini responses
+1. Extract text from the uploaded PDF
+2. Generate vector embeddings and build a FAISS index
+3. Launch a terminal chat loop using Gemini + semantic search
 
-Sample CLI interaction:
+Example:
 
 ```
 🤖 AI Bot is ready! Ask me anything about your document.
@@ -119,52 +138,52 @@ Type `exit` or `quit` to end the session.
 
 ---
 
-##  How It Works
+##  How It Works (RAG Pipeline)
 
-- `ingest.py` → Extracts full text from a PDF using PyMuPDF  
-- `indexing.py` → Converts text into embeddings with `sentence-transformers` and stores in FAISS  
-- `run_bot.py` → Orchestrates the full pipeline, launches the terminal-based Q&A loop  
-- `retrieval.py` & `qa_bot.py` → Contain modular logic for semantic search and Gemini response generation—can be reused in other interfaces
+- `ingest.py` → Reads the uploaded PDF and saves clean text
+- `indexing.py` → Embeds the text and builds the FAISS index for semantic search
+- `retrieval.py` → Pulls the top-k relevant chunks from your document
+- `qa_bot.py` → Builds Gemini prompts using those chunks as context
+- `run_bot.py` → Automates the full pipeline and launches the interactive terminal bot
 
 ---
 
-##  Document Requirements
+##  Document Guidelines
 
-- File format: PDF  
-- Place the file in the `data/` folder (default)  
-- You can adjust the file path in `ingest.py` if needed
+- Format: PDF only (support for other formats can be added)
+- Place your file inside the `data/` folder before running
+- Large or image-heavy PDFs should contain extractable text
 
 ---
 
 ##  Configuration Tips
 
-- Adjust `k=3` in `similarity_search()` for more or fewer retrieved chunks  
-- Switch to `gemini-1.5-pro` or other supported model by updating `.env`  
-- Want persistent memory or a web UI? This structure makes it easy to extend!
+- Adjust `k` in `similarity_search(query, k=3)` to expand/restrict retrieved context
+- Update `GEMINI_MODEL` in `.env` for better accuracy or response quality
+- Want to expose this bot as a web app or API? Just reuse `qa_bot.py` and `retrieval.py`!
 
 ---
 
 ##  Future Enhancements
 
--  Streamlit or Flask-based Web Interface  
--  Telegram Chatbot integration  
--  Persistent memory across sessions  
--  Upload-anywhere document interface  
--  Visualization dashboard for FAISS embeddings
+-  Streamlit front-end (web-based version)
+-  Persistent memory or history across sessions
+-  Telegram / WhatsApp chatbot modes
+-  Multi-file or folder-based ingestion
+-  FAISS visual diagnostics and cluster heatmaps
 
 ---
 
 ##  License
 
 This project is licensed under the **MIT License**.  
-You're free to use, modify, and build on it!
+Use it freely, modify it, and contribute!
 
 ---
 
-## Contact & Credits
+##  Contact & Credits
 
 Created by [@Rnaveennithyakalyan](https://github.com/Rnaveennithyakalyan)  
 Email: [naveennithyakalyan@gmail.com](mailto:naveennithyakalyan@gmail.com)
 
 ---
-
