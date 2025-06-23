@@ -1,0 +1,4 @@
+embedding_model: "google-generativeai"
+retrieval_depth: 5  
+chunk_size: 512  
+reranking: true  
