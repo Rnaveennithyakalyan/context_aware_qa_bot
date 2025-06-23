@@ -57,7 +57,7 @@ This prevents hallucinations, increases traceability, and makes the model act mo
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/context_aware_qa_bot.git
+git clone https://github.com/Rnaveennithyakalyan/context_aware_qa_bot
 cd context_aware_qa_bot
 ```
 
