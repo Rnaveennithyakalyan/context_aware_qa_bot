@@ -99,8 +99,6 @@ GEMINI_API_KEY=your-google-api-key
 GEMINI_MODEL=gemini-2.0-flash
 ```
 
-> Never commit your `.env` file to version control
-
 ---
 
 ##  Upload Your PDF (Before Running)
