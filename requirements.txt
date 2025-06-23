@@ -1,0 +1,10 @@
+langchain
+llama-index
+google-generativeai
+PyMuPDF  # PDF processing
+faiss-cpu  # Vector database for retrieval
+tiktoken  # Tokenizer for text processing (if needed)
+pandas  # (Optional) for handling structured data
+sentence-transformers
+numpy
+json
