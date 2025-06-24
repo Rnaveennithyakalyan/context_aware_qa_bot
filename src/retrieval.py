@@ -4,19 +4,19 @@ import google.generativeai as genai
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface.embeddings import HuggingFaceEmbeddings
 
-# ✅ Load environment variables from `.env` in `configs/`
+# Load environment variables from `.env` in `configs/`
 load_dotenv(dotenv_path="configs/.env")
 
-# ✅ Retrieve API key securely
+#  Retrieve API key securely
 api_key = os.getenv("GEMINI_API_KEY")
 
-# ✅ Validate API key before configuring Gemini API
+#  Validate API key before configuring Gemini API
 if not api_key:
     raise ValueError("API key missing! Ensure 'GEMINI_API_KEY' is set in configs/.env.")
 
 genai.configure(api_key=api_key)
 
-# ✅ Load stored FAISS embeddings
+#  Load stored FAISS embeddings
 embeddings_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 vectorstore = FAISS.load_local("faiss_index", embeddings_model, allow_dangerous_deserialization=True)
 
